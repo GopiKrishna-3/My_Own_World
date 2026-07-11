@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Post, PostInteraction
+from .models import Post, PostInteraction, Follow
 from .serializers import PostSerializer
 from django.contrib.auth.models import User
 @api_view(['POST'])
@@ -91,9 +91,30 @@ def create_post(request):
 
 
 
+from users.models import Friendship
+from django.db.models import Q
+
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_all_posts(request):
-    posts = Post.objects.all().order_by('-created_at')  # Fetch all posts ordered by creation time
+    user = request.user
+    
+    # Get IDs of connected friends
+    friendships = Friendship.objects.filter(
+        (Q(from_user=user) | Q(to_user=user)) & Q(status='accepted')
+    )
+    friend_ids = []
+    for f in friendships:
+        if f.from_user == user:
+            friend_ids.append(f.to_user.id)
+        else:
+            friend_ids.append(f.from_user.id)
+            
+    # Filter posts by the logged-in user and their friends
+    posts = Post.objects.filter(
+        user_id__in=friend_ids + [user.id]
+    ).order_by('-created_at')
+    
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

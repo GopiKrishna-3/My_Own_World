@@ -59,18 +59,24 @@ const PostsList = () => {
         padding: '80px 0 20px 0',
       }}
     >
-      <div className="container" style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', padding: '20px', borderRadius: '15px' }}>
+      <div className="container" style={{ 
+        backgroundColor: 'rgba(255, 255, 255, 0.4)', 
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        padding: '20px', 
+        borderRadius: '15px' 
+      }}>
         <div className="position-relative mb-4 text-center">
           <button 
             type="button" 
-            className="btn btn-link p-0 text-white position-absolute start-0 top-50 translate-middle-y" 
+            className="btn btn-link p-0 text-dark position-absolute start-0 top-50 translate-middle-y" 
             style={{ textDecoration: 'none', fontSize: '28px' }} 
             onClick={() => navigate(-1)}
             title="Go Back"
           >
             &#8592;
           </button>
-          <h2 className="m-0 d-inline-block fw-bold text-white">Feed</h2>
+          <h2 className="m-0 d-inline-block fw-bold text-dark">Feed</h2>
         </div>
         
         <div className="row justify-content-center">

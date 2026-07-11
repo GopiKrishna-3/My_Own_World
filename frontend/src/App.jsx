@@ -24,11 +24,13 @@ function App() {
           <Route path='/'  element={<Login onLogin={handleRedirect}/>}/>
           <Route path='/signup' element={<SignUp />}/>
           <Route path='/home' element={isLoggedIn ?<Home onSignOut={handleRedirect}/>: <Navigate to="/" />}/>
-          <Route path='/profile' element={isLoggedIn ?<Profile />: <Navigate to="/" />}/>
+          <Route path='/profile' element={isLoggedIn ?<Profile onSignOut={handleRedirect} />: <Navigate to="/" />}/>
+          <Route path='/profile/:username' element={isLoggedIn ?<Profile onSignOut={handleRedirect} />: <Navigate to="/" />}/>
           <Route path='/posts' element={isLoggedIn ?<PostsList />: <Navigate to="/" />}/>
           <Route path='/add-post' element={isLoggedIn ?<AddPost />: <Navigate to="/" />}/>
           <Route path='/user-post' element={isLoggedIn ?<UserPosts />: <Navigate to="/" />}/>
           <Route path='/friends' element={isLoggedIn ?<Friends />: <Navigate to="/" />}/>
+          <Route path='/chat' element={isLoggedIn ?<Friends defaultTab="find" />: <Navigate to="/" />}/>
         </Routes>
       </Router>
     </>

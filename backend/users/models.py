@@ -28,3 +28,23 @@ class Friendship(models.Model):
 
     def __str__(self):
         return f"{self.from_user.username} -> {self.to_user.username} ({self.status})"
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, related_name='messages_sent', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='messages_received', on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} to {self.receiver.username} at {self.created_at}"
+
+class Block(models.Model):
+    blocker = models.ForeignKey(User, related_name='blocks_created', on_delete=models.CASCADE)
+    blocked_user = models.ForeignKey(User, related_name='blocks_received', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('blocker', 'blocked_user')
+
+    def __str__(self):
+        return f"{self.blocker.username} blocked {self.blocked_user.username}"

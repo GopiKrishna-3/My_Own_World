@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import profileImage from '../assets/profile2.jpg';
 
-const Profile = () => {
+const Profile = ({ onSignOut }) => {
   const navigate = useNavigate();
+  const { username } = useParams();
 
-  const user = localStorage.getItem('username');
+  const loggedInUser = localStorage.getItem('username');
+  const isOwnProfile = !username || username === loggedInUser;
+  const targetUsername = username || loggedInUser;
+  
   const mail = localStorage.getItem('email');
   const access = localStorage.getItem('accessToken');
 
   const [formData, setFormData] = useState({
-    username: user,
-    email: mail,
+    username: targetUsername,
+    email: isOwnProfile ? mail : '',
     phone: '',
     gender: '',
     bio: '',
@@ -21,10 +25,34 @@ const Profile = () => {
   const [message, setMessage] = useState('');
   const [initialLoading, setInitialLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const handleSignOut = async () => {
+      try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          const response = await fetch('http://127.0.0.1:8000/api/user/logout', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ refresh: refreshToken }),
+          });
+          if (response.ok) {
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
+              if (onSignOut) onSignOut(false);
+              navigate('/');
+          }
+      } catch (err) {
+          console.error('Error signing out:', err);
+      }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const apiUrl = 'http://127.0.0.1:8000/api/user/profile/data';
+      const apiUrl = isOwnProfile 
+        ? 'http://127.0.0.1:8000/api/user/profile/data'
+        : `http://127.0.0.1:8000/api/user/profile/data/${targetUsername}`;
       try {
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -37,8 +65,8 @@ const Profile = () => {
         if (response.ok) {
           const data = await response.json();
           setFormData({
-            username: user,
-            email: mail,
+            username: targetUsername,
+            email: data.email || (isOwnProfile ? mail : ''),
             phone: data.phone || '',
             gender: data.gender || '',
             bio: data.bio || '',
@@ -60,7 +88,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [user, mail, access]);
+  }, [targetUsername, isOwnProfile, mail, access]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -125,24 +153,52 @@ const Profile = () => {
       <div
         style={{
           backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
           padding: '30px',
           borderRadius: '15px',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
           maxWidth: '800px',
           width: '100%',
         }}
       >
-        <div className="position-relative mb-4 text-center">
+        <div className="position-relative mb-4 text-center d-flex justify-content-between align-items-center">
           <button 
             type="button" 
-            className="btn btn-link p-0 text-dark position-absolute start-0 top-50 translate-middle-y" 
+            className="btn btn-link p-0 text-dark" 
             style={{ textDecoration: 'none', fontSize: '28px' }} 
             onClick={() => navigate(-1)}
             title="Go Back"
           >
             &#8592;
           </button>
-          <h2 className="m-0 d-inline-block fw-bold text-black">Profile Page</h2>
+          <h2 className="m-0 fw-bold text-black flex-grow-1">Profile Page</h2>
+          {isOwnProfile && (
+            <div className="position-relative">
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setShowSettings(!showSettings)}
+                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+              >
+                ⚙️ Settings
+              </button>
+              {showSettings && (
+                <div className="position-absolute bg-white border rounded shadow p-2 mt-2" style={{ right: 0, top: '100%', zIndex: 1100, width: '150px' }}>
+                  <button
+                    className="btn btn-light w-100 mb-1"
+                    onClick={() => { setIsEditing(true); setShowSettings(false); }}
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    className="btn btn-danger w-100"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {!isEditing ? (
@@ -168,22 +224,6 @@ const Profile = () => {
               <p style={{ fontSize: '18px', color: '#111', margin: 0, whiteSpace: 'pre-wrap' }}>{formData.bio || 'Not provided'}</p>
             </div>
             
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <button
-                onClick={() => setIsEditing(true)}
-                style={{
-                  backgroundColor: 'rgb(241, 137, 52)',
-                  color: '#fff',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}
-              >
-                Edit Profile
-              </button>
-            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>

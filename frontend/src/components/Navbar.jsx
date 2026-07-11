@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ onSignOut }) => {
     const navigate = useNavigate();
+    const [showSettings, setShowSettings] = useState(false);
 
     const handleSignOut = async () => {
         try {
@@ -42,11 +43,7 @@ const Navbar = ({ onSignOut }) => {
                                 Home
                             </button>
                         </li>
-                        <li className="nav-item">
-                            <button className="nav-link btn" style={styles.navButton} onClick={() => navigate('/profile')}>
-                                Profile
-                            </button>
-                        </li>
+
                         <li className="nav-item">
                             <button className="nav-link btn" style={styles.navButton} onClick={() => navigate('/posts')}>
                                 Posts
@@ -67,15 +64,22 @@ const Navbar = ({ onSignOut }) => {
                                 Friends
                             </button>
                         </li>
+                        <li className="nav-item">
+                            <button className="nav-link btn" style={styles.navButton} onClick={() => navigate('/chat')}>
+                                Chat
+                            </button>
+                        </li>
                     </ul>
                 </div>
-                <button
-                    className="btn btn-danger ms-auto"
-                    style={styles.signOutButton}
-                    onClick={handleSignOut}
-                >
-                    Sign Out
-                </button>
+                <div className="position-relative ms-auto">
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => navigate('/profile')}
+                        style={{ display: 'flex', alignItems: 'center', gap: '5px', backgroundColor: '#dc3545', border: 'none' }}
+                    >
+                        👤 Profile
+                    </button>
+                </div>
             </div>
         </nav>
     );

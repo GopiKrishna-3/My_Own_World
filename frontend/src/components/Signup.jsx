@@ -43,10 +43,11 @@ const SignUp = () => {
     >
       <div
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent white background for readability
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
           padding: '30px',
           borderRadius: '15px',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
           width: '100%',
           maxWidth: '500px', // Limit form width
         }}

@@ -15,4 +15,7 @@ urlpatterns = [
     path('friends/request/respond', views.respond_friend_request, name='respond_friend_request'),
     path('friends/list', views.list_friends, name='list_friends'),
     path('friends/pending', views.list_pending_requests, name='list_pending_requests'),
+    path('friends/chat/<int:user_id>', views.chat_messages, name='chat_messages'),
+    path('profile/data/<str:username>', views.get_user_profile, name='get_user_profile'),
+    path('friends/block', views.block_user, name='block_user'),
 ]
