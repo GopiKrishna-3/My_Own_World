@@ -7,6 +7,7 @@ import Profile from './components/Profile';
 import PostsList from './components/PostsList';
 import AddPost from './components/AddPost';
 import UserPosts from './components/UserPost';
+import Friends from './components/Friends';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path='/posts' element={isLoggedIn ?<PostsList />: <Navigate to="/" />}/>
           <Route path='/add-post' element={isLoggedIn ?<AddPost />: <Navigate to="/" />}/>
           <Route path='/user-post' element={isLoggedIn ?<UserPosts />: <Navigate to="/" />}/>
+          <Route path='/friends' element={isLoggedIn ?<Friends />: <Navigate to="/" />}/>
         </Routes>
       </Router>
     </>

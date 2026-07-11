@@ -64,6 +64,11 @@ const Home = ({ onSignOut }) => {
                                     Add Posts
                                 </button>
                             </li>
+                            <li className="nav-item">
+                                <button className="nav-link btn" style={styles.navButton} onClick={() => navigate('/friends')}>
+                                    Friends
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <button
