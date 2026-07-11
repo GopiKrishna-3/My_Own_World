@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/api/user';
+const API_URL = 'http://127.0.0.1:8000/api/user/';
 
 
 // Sign up function
@@ -16,7 +16,8 @@ export const signUpUser = async (username, email, password) => {
     });
   
     if (!response.ok) {
-      throw new Error('Signup failed');
+      const err = await response.json();
+      throw new Error(err.error || 'Signup failed');
     }
   
     return await response.json();
@@ -48,13 +49,14 @@ export const loginUser = async (username, password) => {
         localStorage.setItem('email', data.email)
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
+        return data;
       } else {
         const error = await response.json();
         console.error('Login failed:', error.error);
+        throw new Error(error.error || 'Login failed');
       }
-      return response.data; // Return access and refresh tokens
     } catch (error) {
-      throw new Error('Login failed. Please check your credentials.');
+      throw new Error(error.message || 'Login failed. Please check your credentials.');
     }
   };
 

@@ -81,6 +81,7 @@ def update_profile(request):
     username = request.data.get('username')
     email = request.data.get('email')
     phone = request.data.get('phone')
+    gender = request.data.get('gender')
     bio = request.data.get('bio')
 
     # Update the User model
@@ -95,6 +96,7 @@ def update_profile(request):
     profile.name = username
     profile.email = email
     profile.phone = phone
+    profile.gender = gender
     profile.bio = bio
     profile.save()
 

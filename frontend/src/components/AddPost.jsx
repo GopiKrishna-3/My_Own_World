@@ -78,10 +78,21 @@ const AddPost = () => {
           maxWidth: '600px',
         }}
       >
-        <h2 className="text-center mb-4">Create a New Post</h2>
-        <form onSubmit={handleSubmit} className="p-4">
+        <div className="position-relative mb-4 text-center">
+          <button 
+            type="button" 
+            className="btn btn-link p-0 text-dark position-absolute start-0 top-50 translate-middle-y" 
+            style={{ textDecoration: 'none', fontSize: '28px' }} 
+            onClick={() => navigate(-1)}
+            title="Go Back"
+          >
+            &#8592;
+          </button>
+          <h2 className="m-0 d-inline-block">Create a New Post</h2>
+        </div>
+        <form onSubmit={handleSubmit} className="p-4 text-start">
           <div className="mb-3">
-            <label htmlFor="title" className="form-label">Title</label>
+            <label htmlFor="title" className="form-label fw-bold text-black">Title</label>
             <input
               type="text"
               id="title"
@@ -93,7 +104,7 @@ const AddPost = () => {
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="content" className="form-label">Content</label>
+            <label htmlFor="content" className="form-label fw-bold text-black">Content</label>
             <textarea
               id="content"
               name="content"

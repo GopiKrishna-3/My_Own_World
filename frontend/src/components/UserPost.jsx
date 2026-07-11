@@ -70,25 +70,30 @@ const UserPosts = () => {
           maxWidth: '800px',
         }}
       >
-        <div className="mb-4">
+        <div className="position-relative mb-4 text-center">
+          <button 
+            type="button" 
+            className="btn btn-link p-0 text-dark position-absolute start-0 top-50 translate-middle-y" 
+            style={{ textDecoration: 'none', fontSize: '28px' }} 
+            onClick={() => navigate(-1)}
+            title="Go Back"
+          >
+            &#8592;
+          </button>
+          <h2 className="m-0 d-inline-block">Your Posts</h2>
+        </div>
+        
+        <div className="mb-4 text-center">
           <button
-            className="btn btn-primary me-3"
+            className="btn btn-primary"
             onClick={() => navigate('/add-post')}
           >
             Create New Post
           </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate('/home')}
-          >
-            Go Back
-          </button>
         </div>
 
-        <h2 className="mb-4">Your Posts</h2>
-
         {posts.length === 0 ? (
-          <p>You haven't created any posts yet.</p>
+          <p className="fw-bold fs-5 text-black">You haven't created any posts yet.</p>
         ) : (
           posts.map((post) => (
             <div key={post.id} className="mb-4">

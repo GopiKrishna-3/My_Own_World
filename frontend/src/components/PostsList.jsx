@@ -67,14 +67,17 @@ const PostsList = () => {
           maxWidth: '100%',
         }}
       >
-        <h2 className="text-center mb-4 text-white">Posts</h2>
-        <div className="mb-3 text-center">
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate('/home')}
+        <div className="position-relative mb-4 text-center">
+          <button 
+            type="button" 
+            className="btn btn-link p-0 text-white position-absolute start-0 top-50 translate-middle-y" 
+            style={{ textDecoration: 'none', fontSize: '28px' }} 
+            onClick={() => navigate(-1)}
+            title="Go Back"
           >
-            Go Back
+            &#8592;
           </button>
+          <h2 className="m-0 d-inline-block text-white">Posts</h2>
         </div>
         <div className="row">
           {posts.map((post) => (

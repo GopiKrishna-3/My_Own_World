@@ -24,7 +24,7 @@ const SignUp = () => {
       navigate('/'); // Navigate to login page after successful sign-up
       setError(''); // Clear error on successful sign-up
     } catch (err) {
-      setError('Signup failed');
+      setError(err.message || 'Signup failed');
     }
   };
 

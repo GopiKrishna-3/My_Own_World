@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 
+def home(request):
+    return JsonResponse({"message": "Backend API is running. The available routes are /api/ and /api/user/."})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/user/', include('users.urls')),
-    path('api/', include('posts.urls'))
+    path('api/', include('posts.urls')),
+    path('', home),
 ]

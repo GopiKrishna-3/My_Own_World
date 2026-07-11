@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import profileImage from '../assets/profile2.jpg'; // Import the profile image for background
+import profileImage from '../assets/profile2.jpg';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -13,14 +13,15 @@ const Profile = () => {
     username: user,
     email: mail,
     phone: '',
+    gender: '',
     bio: '',
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [initialLoading, setInitialLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch the profile data on component mount
   useEffect(() => {
     const fetchProfile = async () => {
       const apiUrl = 'http://127.0.0.1:8000/api/user/profile/data';
@@ -39,20 +40,27 @@ const Profile = () => {
             username: user,
             email: mail,
             phone: data.phone || '',
+            gender: data.gender || '',
             bio: data.bio || '',
           });
+          
+          if (!data.phone && !data.bio) {
+            setIsEditing(true);
+          }
         } else {
           console.error('Failed to fetch profile data');
+          setIsEditing(true);
         }
       } catch (error) {
         console.error('Error fetching profile data:', error);
+        setIsEditing(true);
       } finally {
         setInitialLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user, mail]);
+  }, [user, mail, access]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,6 +89,7 @@ const Profile = () => {
 
       if (response.ok) {
         setMessage('Profile updated successfully!');
+        setIsEditing(false); // Switch back to view mode on success
       } else {
         setMessage('Failed to update profile. Please try again.');
       }
@@ -102,7 +111,7 @@ const Profile = () => {
   return (
     <div
       style={{
-        backgroundImage: `url(${profileImage})`, // Background image applied here
+        backgroundImage: `url(${profileImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: '100vh',
@@ -110,122 +119,227 @@ const Profile = () => {
         justifyContent: 'center',
         alignItems: 'center',
         padding: '20px',
-        color: 'white', // Text color for better contrast with the background
+        color: 'white',
       }}
     >
       <div
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.18)', // Light background for readability
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
           padding: '30px',
           borderRadius: '15px',
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          maxWidth: '500px',
+          maxWidth: '800px',
           width: '100%',
         }}
       >
-        <h2 style={{ textAlign: 'center', color: 'black', marginBottom: '20px' }}>Profile Page</h2>
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="username" style={{ display: 'block', marginBottom: '5px', color: 'black' }}>
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #ddd',
-                backgroundColor: 'rgb(255,255,255)',
-              }}
-              disabled
-            />
+        <div className="position-relative mb-4 text-center">
+          <button 
+            type="button" 
+            className="btn btn-link p-0 text-dark position-absolute start-0 top-50 translate-middle-y" 
+            style={{ textDecoration: 'none', fontSize: '28px' }} 
+            onClick={() => navigate(-1)}
+            title="Go Back"
+          >
+            &#8592;
+          </button>
+          <h2 className="m-0 d-inline-block fw-bold text-black">Profile Page</h2>
+        </div>
+
+        {!isEditing ? (
+          <div>
+            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Username</label>
+              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.username}</p>
+            </div>
+            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Email</label>
+              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.email}</p>
+            </div>
+            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Phone Number</label>
+              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.phone || 'Not provided'}</p>
+            </div>
+            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Gender</label>
+              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.gender || 'Not provided'}</p>
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Bio</label>
+              <p style={{ fontSize: '18px', color: '#111', margin: 0, whiteSpace: 'pre-wrap' }}>{formData.bio || 'Not provided'}</p>
+            </div>
+            
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <button
+                onClick={() => setIsEditing(true)}
+                style={{
+                  backgroundColor: 'rgb(241, 137, 52)',
+                  color: '#fff',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                Edit Profile
+              </button>
+            </div>
           </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="email" style={{ display: 'block', marginBottom: '5px', color: 'black' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #ddd',
-                backgroundColor: 'rgb(255,255,255)',
-              }}
-              disabled
-            />
-          </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="phone" style={{ display: 'block', marginBottom: '5px', color: 'black' }}>
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #ddd',
-                backgroundColor: 'rgb(255,255,255)',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="bio" style={{ display: 'block', marginBottom: '5px', color: 'black' }}>
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #ddd',
-                backgroundColor: 'rgb(255,255,255)',
-              }}
-              rows="4"
-            ></textarea>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <button
-              type="submit"
-              style={{
-                backgroundColor: 'rgb(241, 137, 52)',
-                color: '#fff',
-                padding: '10px 20px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              disabled={loading}
-            >
-              {loading ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="username" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  backgroundColor: '#f5f5f5',
+                  color: '#666'
+                }}
+                disabled
+              />
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="email" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  backgroundColor: '#f5f5f5',
+                  color: '#666'
+                }}
+                disabled
+              />
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="phone" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'rgb(255,255,255)',
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="gender" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
+                Gender
+              </label>
+              <select
+                id="gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'rgb(255,255,255)',
+                }}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="bio" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
+                Bio
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  backgroundColor: 'rgb(255,255,255)',
+                }}
+                rows="4"
+              ></textarea>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <button
+                type="submit"
+                style={{
+                  backgroundColor: 'rgb(241, 137, 52)',
+                  color: '#fff',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  marginRight: '10px'
+                }}
+                disabled={loading}
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+              
+              {/* Optional cancel button if they want to discard changes (only if they have data) */}
+              {(formData.phone || formData.bio) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setMessage('');
+                  }}
+                  style={{
+                    backgroundColor: '#6c757d',
+                    color: '#fff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        )}
+
         {message && (
           <div
             style={{
               marginTop: '20px',
               color: message.includes('successfully') ? 'green' : 'red',
               textAlign: 'center',
+              fontWeight: 'bold'
             }}
           >
             {message}
@@ -234,13 +348,13 @@ const Profile = () => {
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <button
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              color: 'rgb(241, 137, 52)',
+              backgroundColor: 'rgba(255, 255, 255, 0.6)',
+              color: 'black',
               padding: '10px 20px',
               borderRadius: '8px',
               border: 'none',
               cursor: 'pointer',
-              
+              fontWeight: 'bold'
             }}
             onClick={handleNavigateHome}
           >
