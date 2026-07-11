@@ -102,6 +102,8 @@ const UserPosts = () => {
                 title={post.title}
                 author={post.author}
                 content={post.content}
+                media_file={post.media_file}
+                media_type={post.media_type}
                 likes={post.like_count}
                 dislikes={post.dislike_count}
               />

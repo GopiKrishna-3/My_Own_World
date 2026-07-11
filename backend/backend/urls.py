@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
+from django.conf import settings
+from django.conf.urls.static import static
 
 def home(request):
     return JsonResponse({"message": "Backend API is running. The available routes are /api/ and /api/user/."})
@@ -26,4 +28,4 @@ urlpatterns = [
     path('api/user/', include('users.urls')),
     path('api/', include('posts.urls')),
     path('', home),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

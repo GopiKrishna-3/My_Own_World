@@ -70,11 +70,21 @@ def create_post(request):
     title = request.data.get('title')
     content = request.data.get('content')
     author = request.user.username  # Automatically take the username of the logged-in user
+    
+    media_file = request.FILES.get('media_file')
+    media_type = request.data.get('media_type')
 
     if not title or not content:
         return Response({'detail': 'Title and content are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    post = Post.objects.create(user=request.user, title=title, content=content, author=author)
+    post = Post.objects.create(
+        user=request.user, 
+        title=title, 
+        content=content, 
+        author=author,
+        media_file=media_file,
+        media_type=media_type
+    )
 
     serializer = PostSerializer(post)
     return Response(serializer.data, status=status.HTTP_201_CREATED)

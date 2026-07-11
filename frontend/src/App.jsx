@@ -8,6 +8,7 @@ import PostsList from './components/PostsList';
 import AddPost from './components/AddPost';
 import UserPosts from './components/UserPost';
 import Friends from './components/Friends';
+import Navbar from './components/Navbar';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
   return (
     <>
       <Router>
+        {isLoggedIn && <Navbar onSignOut={handleRedirect} />}
         <Routes>
           <Route path='/'  element={<Login onLogin={handleRedirect}/>}/>
           <Route path='/signup' element={<SignUp />}/>

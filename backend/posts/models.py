@@ -6,6 +6,8 @@ class Post(models.Model):
     author = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     content = models.TextField()
+    media_file = models.FileField(upload_to='post_media/', null=True, blank=True)
+    media_type = models.CharField(max_length=10, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

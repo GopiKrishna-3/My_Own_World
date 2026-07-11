@@ -54,19 +54,12 @@ const PostsList = () => {
         backgroundImage: `url(${createPostImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
         minHeight: '100vh',
-        padding: '20px',
+        padding: '80px 0 20px 0',
       }}
     >
-      <div
-        style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          padding: '30px',
-          borderRadius: '15px',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          maxWidth: '100%',
-        }}
-      >
+      <div className="container" style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', padding: '20px', borderRadius: '15px' }}>
         <div className="position-relative mb-4 text-center">
           <button 
             type="button" 
@@ -77,24 +70,34 @@ const PostsList = () => {
           >
             &#8592;
           </button>
-          <h2 className="m-0 d-inline-block text-white">Posts</h2>
+          <h2 className="m-0 d-inline-block fw-bold text-white">Feed</h2>
         </div>
-        <div className="row">
-          {posts.map((post) => (
-            <div className="col-md-4" key={post.id}>
+        
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-8 col-lg-6">
+            {posts.map((post) => (
               <Post
+                key={post.id}
                 postId={post.id}
                 title={post.title}
                 author={post.author}
                 content={post.content}
+                media_file={post.media_file}
+                media_type={post.media_type}
                 likes={post.like_count}
                 dislikes={post.dislike_count}
                 onDelete={handleDelete}
                 onFollow={handleFollow}
                 onUnfollow={handleUnfollow}
               />
-            </div>
-          ))}
+            ))}
+            
+            {posts.length === 0 && (
+              <div className="text-center text-muted mt-5">
+                <h5>No posts yet. Be the first to share something!</h5>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
