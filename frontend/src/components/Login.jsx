@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { loginUser } from './api'; // import login function
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import loginImage from '../assets/login.jpg'; // Import the background image
 
 const Login = ({ onLogin }) => {
@@ -84,7 +84,7 @@ const Login = ({ onLogin }) => {
         </form>
 
         <p className="mt-3 text-center" style={styles.signUpText}>
-          Don't have an account? <a href="/signup" style={styles.signUpLink}>Sign Up</a>
+          Don&apos;t have an account? <Link to="/signup" style={styles.signUpLink}>Sign Up</Link>
         </p>
       </div>
     </div>

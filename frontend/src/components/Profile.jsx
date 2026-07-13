@@ -30,7 +30,7 @@ const Profile = ({ onSignOut }) => {
   const handleSignOut = async () => {
       try {
           const refreshToken = localStorage.getItem('refreshToken');
-          const response = await fetch('http://127.0.0.1:8000/api/user/logout', {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/logout`, {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
@@ -51,8 +51,8 @@ const Profile = ({ onSignOut }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       const apiUrl = isOwnProfile 
-        ? 'http://127.0.0.1:8000/api/user/profile/data'
-        : `http://127.0.0.1:8000/api/user/profile/data/${targetUsername}`;
+        ? `${import.meta.env.VITE_API_BASE_URL}/api/user/profile/data`
+        : `${import.meta.env.VITE_API_BASE_URL}/api/user/profile/data/${targetUsername}`;
       try {
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -103,7 +103,7 @@ const Profile = ({ onSignOut }) => {
     setLoading(true);
     setMessage('');
 
-    const apiUrl = 'http://127.0.0.1:8000/api/user/profile/update';
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/user/profile/update`;
 
     try {
       const response = await fetch(apiUrl, {

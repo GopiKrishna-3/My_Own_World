@@ -13,7 +13,7 @@ const UserPosts = () => {
     const accessToken = localStorage.getItem('accessToken');  // Get the token from local storage
     
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/posts/user/', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/posts/user/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,  // Send token in the header
@@ -67,7 +67,6 @@ const UserPosts = () => {
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
           padding: '30px',
           borderRadius: '15px',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
           width: '100%',
           maxWidth: '800px',
         }}
@@ -95,7 +94,7 @@ const UserPosts = () => {
         </div>
 
         {posts.length === 0 ? (
-          <p className="fw-bold fs-5 text-black">You haven't created any posts yet.</p>
+          <p className="fw-bold fs-5 text-black">You haven&apos;t created any posts yet.</p>
         ) : (
           posts.map((post) => (
             <div key={post.id} className="mb-4">

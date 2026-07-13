@@ -65,7 +65,7 @@ const AddPost = () => {
     setLoading(true);
     setMessage('');
 
-    const apiUrl = 'http://127.0.0.1:8000/api/posts/';
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/posts/`;
     const accessToken = localStorage.getItem('accessToken');
 
     const submitData = new FormData();

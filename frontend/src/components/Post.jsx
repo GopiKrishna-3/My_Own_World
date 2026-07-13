@@ -22,7 +22,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   const handleLike = async () => {
     const accessToken = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/post/${postId}/like/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/post/${postId}/like/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -56,7 +56,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   const handleDislike = async () => {
     const accessToken = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/post/${postId}/dislike/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/post/${postId}/dislike/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -89,7 +89,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   // Handle Edit
   const handleEdit = async () => {
     const accessToken = localStorage.getItem('accessToken');
-    const editUrl = `http://127.0.0.1:8000/api/post/${postId}/edit/`;
+    const editUrl = `${import.meta.env.VITE_API_BASE_URL}/api/post/${postId}/edit/`;
 
     try {
       const response = await fetch(editUrl, {
@@ -118,7 +118,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   // Handle Delete
   const handleDelete = async () => {
     const accessToken = localStorage.getItem('accessToken');
-    const deleteUrl = `http://127.0.0.1:8000/api/post/${postId}/delete/`;
+    const deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/post/${postId}/delete/`;
 
     try {
       const response = await fetch(deleteUrl, {
@@ -143,7 +143,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   // Handle Follow
   const handleFollow = async () => {
     const accessToken = localStorage.getItem('accessToken');
-    const followUrl = `http://127.0.0.1:8000/api/user/${author}/follow/`;
+    const followUrl = `${import.meta.env.VITE_API_BASE_URL}/api/user/${author}/follow/`;
 
     try {
       const response = await fetch(followUrl, {
@@ -169,7 +169,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   // Handle Unfollow
   const handleUnfollow = async () => {
     const accessToken = localStorage.getItem('accessToken');
-    const unfollowUrl = `http://127.0.0.1:8000/api/user/${author}/unfollow/`;
+    const unfollowUrl = `${import.meta.env.VITE_API_BASE_URL}/api/user/${author}/unfollow/`;
 
     try {
       const response = await fetch(unfollowUrl, {
@@ -195,7 +195,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   const fetchComments = async () => {
     const accessToken = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/post/${postId}/comments/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/post/${postId}/comments/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -217,7 +217,7 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
 
     const accessToken = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/post/${postId}/comments/add/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/post/${postId}/comments/add/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -333,10 +333,10 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
             {media_file && (
               <div className="mt-3 text-center" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', overflow: 'hidden' }}>
                 {media_type === 'image' ? (
-                  <img src={media_file.startsWith('http') ? media_file : `http://127.0.0.1:8000${media_file}`} alt="Post Media" style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain' }} />
+                  <img src={media_file.startsWith('http') ? media_file : `${import.meta.env.VITE_API_BASE_URL}${media_file}`} alt="Post Media" style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain' }} />
                 ) : media_type === 'video' ? (
                   <video controls style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain' }}>
-                    <source src={media_file.startsWith('http') ? media_file : `http://127.0.0.1:8000${media_file}`} />
+                    <source src={media_file.startsWith('http') ? media_file : `${import.meta.env.VITE_API_BASE_URL}${media_file}`} />
                     Your browser does not support the video tag.
                   </video>
                 ) : null}

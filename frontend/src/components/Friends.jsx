@@ -30,7 +30,7 @@ const Friends = ({ defaultTab = 'find' }) => {
 
     const fetchMessages = async (userId) => {
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/user/friends/chat/${userId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/chat/${userId}`, {
                 headers: { 'Authorization': `Bearer ${access}` }
             });
             if (res.ok) setMessages(await res.json());
@@ -41,7 +41,7 @@ const Friends = ({ defaultTab = 'find' }) => {
         e.preventDefault();
         if (!newMessage.trim() || !activeChat) return;
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/user/friends/chat/${activeChat.id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/chat/${activeChat.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ const Friends = ({ defaultTab = 'find' }) => {
     const fetchUsers = async (query = '') => {
         setLoading(true);
         try {
-            const url = query ? `http://127.0.0.1:8000/api/user/friends/search?q=${query}` : 'http://127.0.0.1:8000/api/user/friends/search';
+            const url = query ? `${import.meta.env.VITE_API_BASE_URL}/api/user/friends/search?q=${query}` : `${import.meta.env.VITE_API_BASE_URL}/api/user/friends/search`;
             const res = await fetch(url, {
                 headers: { 'Authorization': `Bearer ${access}` }
             });
@@ -90,7 +90,7 @@ const Friends = ({ defaultTab = 'find' }) => {
     const fetchPendingRequests = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/user/friends/pending', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/pending`, {
                 headers: { 'Authorization': `Bearer ${access}` }
             });
             if (res.ok) setPendingRequests(await res.json());
@@ -101,7 +101,7 @@ const Friends = ({ defaultTab = 'find' }) => {
     const fetchMyFriends = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/user/friends/list', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/list`, {
                 headers: { 'Authorization': `Bearer ${access}` }
             });
             if (res.ok) setMyFriends(await res.json());
@@ -111,7 +111,7 @@ const Friends = ({ defaultTab = 'find' }) => {
 
     const sendRequest = async (toUserId) => {
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/user/friends/request/send', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/request/send`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ const Friends = ({ defaultTab = 'find' }) => {
 
     const respondRequest = async (fromUserId, action) => {
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/user/friends/request/respond', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/request/respond`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ const Friends = ({ defaultTab = 'find' }) => {
     const blockFriend = async () => {
         if (!window.confirm(`Are you sure you want to block ${activeChat.username}?`)) return;
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/user/friends/block', {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/block`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${access}`,

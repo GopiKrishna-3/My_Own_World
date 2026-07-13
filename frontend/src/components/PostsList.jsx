@@ -10,7 +10,7 @@ const PostsList = () => {
   // Fetch all posts
   const fetchPosts = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/posts/get/', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/posts/get/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
