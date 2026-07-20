@@ -8,6 +8,8 @@ class Profile(models.Model):
     phone = models.CharField(max_length=15, blank=True, null=True)
     gender = models.CharField(max_length=20, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+    chat_wallpaper = models.CharField(max_length=50, default='default')
+    chat_bubble_theme = models.CharField(max_length=50, default='indigo')
 
     def __str__(self):
         return f"Profile of {self.user.username}"

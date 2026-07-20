@@ -18,4 +18,5 @@ urlpatterns = [
     path('friends/chat/<int:user_id>', views.chat_messages, name='chat_messages'),
     path('profile/data/<str:username>', views.get_user_profile, name='get_user_profile'),
     path('friends/block', views.block_user, name='block_user'),
+    path('chat/preferences/', views.manage_chat_preferences, name='manage_chat_preferences'),
 ]

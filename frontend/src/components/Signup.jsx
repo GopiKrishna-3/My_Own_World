@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { signUpUser } from './api'; // Import sign-up function
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
-import signImage from '../assets/sign.jpg'; // Import the background image
+import { signUpUser } from './api';
+import { useNavigate, Link } from 'react-router-dom';
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState(''); // Added email state
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,48 +18,28 @@ const SignUp = () => {
     }
 
     try {
-      // Include email in the request
-      const data = await signUpUser(username, email, password); // Set the logged-in state to true
-      navigate('/'); // Navigate to login page after successful sign-up
-      setError(''); // Clear error on successful sign-up
+      const data = await signUpUser(username, email, password);
+      navigate('/login');
+      setError('');
     } catch (err) {
       setError(err.message || 'Signup failed');
     }
   };
 
   return (
-    <div
-      style={{
-        backgroundImage: `url(${signImage})`, // Apply the background image
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '20px',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-          padding: '30px',
-          borderRadius: '15px',
-          width: '100%',
-          maxWidth: '500px', // Limit form width
-        }}
-      >
-        <h2 className="text-center mb-4">Sign Up</h2>
-        {error && <div className="alert alert-danger">{error}</div>}
+    <div className="auth-container">
+      <div className="premium-card" style={{ maxWidth: '400px' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: 'var(--accent-primary)' }}>Sign Up</h2>
+        
+        {error && <div className="alert alert-danger border-0">{error}</div>}
+        
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
+          <div className="mb-3">
+            <label htmlFor="username" className="form-label text-muted-dark">Username</label>
             <input
               type="text"
               id="username"
-              className="form-control"
+              className="form-control-dark w-100"
               placeholder="Enter username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -68,12 +47,12 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="form-group mt-3">
-            <label htmlFor="email">Email</label>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label text-muted-dark">Email</label>
             <input
               type="email"
               id="email"
-              className="form-control"
+              className="form-control-dark w-100"
               placeholder="Enter email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -81,12 +60,12 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="form-group mt-3">
-            <label htmlFor="password">Password</label>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label text-muted-dark">Password</label>
             <input
               type="password"
               id="password"
-              className="form-control"
+              className="form-control-dark w-100"
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -94,12 +73,12 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="form-group mt-3">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+          <div className="mb-4">
+            <label htmlFor="confirmPassword" className="form-label text-muted-dark">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"
-              className="form-control"
+              className="form-control-dark w-100"
               placeholder="Confirm password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -107,13 +86,13 @@ const SignUp = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-block mt-4">
+          <button type="submit" className="btn-primary-accent w-100 py-2">
             Sign Up
           </button>
         </form>
 
-        <p className="mt-3 text-center">
-          Already have an account? <a href="/">Login</a>
+        <p className="mt-4 text-center text-muted-dark mb-0">
+          Already have an account? <Link to="/login" className="text-decoration-none fw-bold" style={{ color: 'var(--accent-primary)' }}>Login</Link>
         </p>
       </div>
     </div>

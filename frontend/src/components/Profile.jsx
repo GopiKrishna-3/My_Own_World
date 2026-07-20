@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import profileImage from '../assets/profile2.jpg';
 
 const Profile = ({ onSignOut }) => {
   const navigate = useNavigate();
@@ -133,273 +132,173 @@ const Profile = ({ onSignOut }) => {
   };
 
   if (initialLoading) {
-    return <div style={{ textAlign: 'center', color: 'pink', fontSize: '20px' }}>Loading profile...</div>;
+    return (
+        <div className="page-container align-items-center justify-content-center">
+            <div className="spinner-border text-primary" role="status" style={{color: 'var(--accent-primary)'}}>
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    );
   }
 
   return (
-    <div
-      style={{
-        backgroundImage: `url(${profileImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '20px',
-        color: 'white',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-          padding: '30px',
-          borderRadius: '15px',
-          maxWidth: '800px',
-          width: '100%',
-        }}
-      >
-        <div className="position-relative mb-4 text-center d-flex justify-content-between align-items-center">
-          <button 
-            type="button" 
-            className="btn btn-link p-0 text-dark" 
-            style={{ textDecoration: 'none', fontSize: '28px' }} 
-            onClick={() => navigate(-1)}
-            title="Go Back"
-          >
-            &#8592;
-          </button>
-          <h2 className="m-0 fw-bold text-black flex-grow-1">Profile Page</h2>
-          {isOwnProfile && (
-            <div className="position-relative">
-              <button 
-                className="btn btn-secondary" 
-                onClick={() => setShowSettings(!showSettings)}
-                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-              >
-                ⚙️ Settings
-              </button>
-              {showSettings && (
-                <div className="position-absolute bg-white border rounded shadow p-2 mt-2" style={{ right: 0, top: '100%', zIndex: 1100, width: '150px' }}>
-                  <button
-                    className="btn btn-light w-100 mb-1"
-                    onClick={() => { setIsEditing(true); setShowSettings(false); }}
-                  >
-                    Edit Profile
-                  </button>
-                  <button
-                    className="btn btn-danger w-100"
-                    onClick={handleSignOut}
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {!isEditing ? (
-          <div>
-            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Username</label>
-              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.username}</p>
-            </div>
-            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Email</label>
-              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.email}</p>
-            </div>
-            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Phone Number</label>
-              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.phone || 'Not provided'}</p>
-            </div>
-            <div style={{ marginBottom: '15px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Gender</label>
-              <p style={{ fontSize: '18px', color: '#111', margin: 0 }}>{formData.gender || 'Not provided'}</p>
-            </div>
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>Bio</label>
-              <p style={{ fontSize: '18px', color: '#111', margin: 0, whiteSpace: 'pre-wrap' }}>{formData.bio || 'Not provided'}</p>
-            </div>
-            
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '15px' }}>
-              <label htmlFor="username" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  backgroundColor: '#f5f5f5',
-                  color: '#666'
-                }}
-                disabled
-              />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label htmlFor="email" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  backgroundColor: '#f5f5f5',
-                  color: '#666'
-                }}
-                disabled
-              />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label htmlFor="phone" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'rgb(255,255,255)',
-                }}
-              />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label htmlFor="gender" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
-                Gender
-              </label>
-              <select
-                id="gender"
-                name="gender"
-                value={formData.gender}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'rgb(255,255,255)',
-                }}
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div style={{ marginBottom: '20px' }}>
-              <label htmlFor="bio" style={{ display: 'block', marginBottom: '5px', color: 'black', fontWeight: 'bold' }}>
-                Bio
-              </label>
-              <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #ddd',
-                  backgroundColor: 'rgb(255,255,255)',
-                }}
-                rows="4"
-              ></textarea>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <button
-                type="submit"
-                style={{
-                  backgroundColor: 'rgb(241, 137, 52)',
-                  color: '#fff',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  marginRight: '10px'
-                }}
-                disabled={loading}
-              >
-                {loading ? 'Saving...' : 'Save Changes'}
-              </button>
-              
-              {/* Optional cancel button if they want to discard changes (only if they have data) */}
-              {(formData.phone || formData.bio) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setMessage('');
-                  }}
-                  style={{
-                    backgroundColor: '#6c757d',
-                    color: '#fff',
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: 'bold'
-                  }}
+    <div className="page-container">
+      <div className="container" style={{ maxWidth: '800px' }}>
+        <div className="premium-card">
+            <div className="position-relative mb-4 text-center d-flex justify-content-between align-items-center">
+                <button 
+                    type="button" 
+                    className="btn btn-link p-0 text-muted-dark" 
+                    onClick={() => navigate(-1)}
+                    title="Go Back"
                 >
-                  Cancel
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </button>
-              )}
+                <h4 className="m-0 fw-bold flex-grow-1">Profile</h4>
+                {isOwnProfile && (
+                    <div className="position-relative">
+                        <button 
+                            className="btn btn-link p-0 text-muted-dark" 
+                            onClick={() => setShowSettings(!showSettings)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        </button>
+                        {showSettings && (
+                            <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm border-0 rounded-3" style={{ minWidth: '150px', zIndex: 1100, backgroundColor: 'var(--bg-tertiary)' }}>
+                                <button className="dropdown-item d-flex align-items-center py-2 text-primary" onClick={() => { setIsEditing(true); setShowSettings(false); }}>
+                                    Edit Profile
+                                </button>
+                                <button className="dropdown-item d-flex align-items-center py-2 text-danger" onClick={handleSignOut}>
+                                    Sign Out
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-          </form>
-        )}
 
-        {message && (
-          <div
-            style={{
-              marginTop: '20px',
-              color: message.includes('successfully') ? 'green' : 'red',
-              textAlign: 'center',
-              fontWeight: 'bold'
-            }}
-          >
-            {message}
-          </div>
-        )}
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <button
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              color: 'black',
-              padding: '10px 20px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-            onClick={handleNavigateHome}
-          >
-            Go to Home
-          </button>
+            <div className="text-center mb-4">
+                <div 
+                    className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style={{ width: '80px', height: '80px', backgroundColor: 'var(--accent-primary)', fontSize: '32px', color: 'white', fontWeight: 'bold' }}
+                >
+                    {formData.username.substring(0,2).toUpperCase()}
+                </div>
+                <h5 className="fw-bold">{formData.username}</h5>
+            </div>
+
+            {!isEditing ? (
+                <div className="px-md-4">
+                    <div className="list-item-dark">
+                        <span className="text-muted-dark fw-bold">Username</span>
+                        <span>{formData.username}</span>
+                    </div>
+                    <div className="list-item-dark">
+                        <span className="text-muted-dark fw-bold">Email</span>
+                        <span>{formData.email}</span>
+                    </div>
+                    <div className="list-item-dark">
+                        <span className="text-muted-dark fw-bold">Phone</span>
+                        <span>{formData.phone || 'Not provided'}</span>
+                    </div>
+                    <div className="list-item-dark">
+                        <span className="text-muted-dark fw-bold">Gender</span>
+                        <span>{formData.gender || 'Not provided'}</span>
+                    </div>
+                    <div className="mt-4 text-center">
+                        <span className="text-muted-dark fw-bold d-block mb-2">Bio</span>
+                        <p className="fst-italic" style={{ whiteSpace: 'pre-wrap' }}>{formData.bio || 'Not provided'}</p>
+                    </div>
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit} className="px-md-4">
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label text-muted-dark fw-bold">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            className="form-control-dark w-100 opacity-50"
+                            disabled
+                        />
+                    </div>
+                    
+                    <div className="mb-3">
+                        <label htmlFor="email" className="form-label text-muted-dark fw-bold">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            className="form-control-dark w-100 opacity-50"
+                            disabled
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="phone" className="form-label text-muted-dark fw-bold">Phone Number</label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="form-control-dark w-100"
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="gender" className="form-label text-muted-dark fw-bold">Gender</label>
+                        <select
+                            id="gender"
+                            name="gender"
+                            value={formData.gender}
+                            onChange={handleChange}
+                            className="form-control-dark w-100"
+                        >
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="bio" className="form-label text-muted-dark fw-bold">Bio</label>
+                        <textarea
+                            id="bio"
+                            name="bio"
+                            value={formData.bio}
+                            onChange={handleChange}
+                            className="form-control-dark w-100"
+                            rows="4"
+                        ></textarea>
+                    </div>
+
+                    <div className="d-flex justify-content-center gap-3">
+                        <button type="submit" className="btn-primary-accent" disabled={loading}>
+                            {loading ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        
+                        {(formData.phone || formData.bio) && (
+                            <button
+                                type="button"
+                                onClick={() => { setIsEditing(false); setMessage(''); }}
+                                className="btn-outline-accent"
+                            >
+                                Cancel
+                            </button>
+                        )}
+                    </div>
+                </form>
+            )}
+
+            {message && (
+                <div className={`mt-4 alert border-0 text-center ${message.includes('successfully') ? 'alert-success bg-success bg-opacity-10 text-success' : 'alert-danger bg-danger bg-opacity-10 text-danger'}`}>
+                    {message}
+                </div>
+            )}
         </div>
       </div>
     </div>

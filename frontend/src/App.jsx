@@ -2,17 +2,17 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import SignUp from './components/Signup';
+import Landing from './components/Landing';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import PostsList from './components/PostsList';
 import AddPost from './components/AddPost';
-import UserPosts from './components/UserPost';
 import Friends from './components/Friends';
 import Navbar from './components/Navbar';
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('accessToken'));
   const handleRedirect = (status) => {
     setIsLoggedIn(status); // Handle login state
   };
@@ -21,14 +21,14 @@ function App() {
       <Router>
         {isLoggedIn && <Navbar onSignOut={handleRedirect} />}
         <Routes>
-          <Route path='/'  element={<Login onLogin={handleRedirect}/>}/>
+          <Route path='/' element={<Landing />} />
+          <Route path='/login' element={<Login onLogin={handleRedirect}/>}/>
           <Route path='/signup' element={<SignUp />}/>
           <Route path='/home' element={isLoggedIn ?<Home onSignOut={handleRedirect}/>: <Navigate to="/" />}/>
           <Route path='/profile' element={isLoggedIn ?<Profile onSignOut={handleRedirect} />: <Navigate to="/" />}/>
           <Route path='/profile/:username' element={isLoggedIn ?<Profile onSignOut={handleRedirect} />: <Navigate to="/" />}/>
           <Route path='/posts' element={isLoggedIn ?<PostsList />: <Navigate to="/" />}/>
           <Route path='/add-post' element={isLoggedIn ?<AddPost />: <Navigate to="/" />}/>
-          <Route path='/user-post' element={isLoggedIn ?<UserPosts />: <Navigate to="/" />}/>
           <Route path='/friends' element={isLoggedIn ?<Friends />: <Navigate to="/" />}/>
           <Route path='/chat' element={isLoggedIn ?<Friends defaultTab="find" />: <Navigate to="/" />}/>
         </Routes>

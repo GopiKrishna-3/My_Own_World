@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, ThumbsDown, MessageCircle, Bookmark, MoreHorizontal, Edit2, Trash2, UserPlus, UserMinus, Send } from 'lucide-react';
 
-const Post = ({ postId, title, author, content, media_file, media_type, likes: initialLikes, dislikes: initialDislikes, onDelete, onFollow, onUnfollow }) => {
+const Post = ({ postId, title, author, author_id, friend_status: initialFriendStatus, content, media_file, media_type, likes: initialLikes, dislikes: initialDislikes, onDelete }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
   const [isSaved, setIsSaved] = useState(false); // Just UI for now
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [friendStatus, setFriendStatus] = useState(initialFriendStatus || 'none');
   const [likes, setLikes] = useState(initialLikes);
   const [dislikes, setDislikes] = useState(initialDislikes);
   const [message, setMessage] = useState('');
@@ -140,54 +140,30 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
     }
   };
 
-  // Handle Follow
-  const handleFollow = async () => {
+  // Handle Add Friend
+  const handleAddFriend = async () => {
+    if (friendStatus === 'request_sent' || friendStatus === 'friends') return;
+    
     const accessToken = localStorage.getItem('accessToken');
-    const followUrl = `${import.meta.env.VITE_API_BASE_URL}/api/user/${author}/follow/`;
-
     try {
-      const response = await fetch(followUrl, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/friends/request/send`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ to_user_id: author_id })
       });
 
       if (response.ok) {
-        setIsFollowing(true);
-        setMessage('User followed successfully!');
-        onFollow(author);
+        setFriendStatus('request_sent');
+        setMessage('Friend request sent!');
       } else {
-        setMessage('Error following the user.');
+        const errorData = await response.json();
+        setMessage(errorData.error || 'Error sending friend request.');
       }
     } catch (error) {
-      setMessage('Error following the user.');
-    }
-  };
-
-  // Handle Unfollow
-  const handleUnfollow = async () => {
-    const accessToken = localStorage.getItem('accessToken');
-    const unfollowUrl = `${import.meta.env.VITE_API_BASE_URL}/api/user/${author}/unfollow/`;
-
-    try {
-      const response = await fetch(unfollowUrl, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        setIsFollowing(false);
-        setMessage('User unfollowed successfully!');
-        onUnfollow(author);
-      } else {
-        setMessage('Error unfollowing the user.');
-      }
-    } catch (error) {
-      setMessage('Error unfollowing the user.');
+      setMessage('Error sending friend request.');
     }
   };
 
@@ -250,14 +226,11 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
   const getInitials = (name) => name ? name.substring(0, 2).toUpperCase() : 'U';
 
   return (
-    <div className="card mb-4 border-0 shadow-sm rounded-4" style={{ backgroundColor: '#ffffff', overflow: 'hidden' }}>
+    <div className="premium-card mb-4">
       {/* Header */}
-      <div className="card-header bg-white border-0 d-flex justify-content-between align-items-center p-3">
+      <div className="premium-card-header d-flex justify-content-between align-items-center">
         <div className="d-flex align-items-center">
-          <div 
-            className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold me-3" 
-            style={{ width: '40px', height: '40px', backgroundColor: '#e1306c', fontSize: '18px' }}
-          >
+          <div className="avatar-circle">
             {getInitials(author)}
           </div>
           <div>
@@ -266,27 +239,30 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
         </div>
         
         <div className="d-flex align-items-center position-relative">
-          {loggedInUser !== author && (
+          {loggedInUser !== author && friendStatus !== 'self' && (
             <button
-              onClick={isFollowing ? handleUnfollow : handleFollow}
-              className={`btn btn-sm me-2 rounded-pill px-3 fw-bold ${isFollowing ? 'btn-light border' : 'btn-primary'}`}
-              style={!isFollowing ? { backgroundColor: '#0095f6', borderColor: '#0095f6' } : {}}
+              onClick={friendStatus === 'none' ? handleAddFriend : undefined}
+              disabled={friendStatus !== 'none'}
+              className={`btn btn-sm me-2 ${friendStatus === 'none' ? 'btn-primary-accent' : 'btn-outline-accent'}`}
             >
-              {isFollowing ? 'Following' : 'Follow'}
+              {friendStatus === 'none' && 'Add Friend'}
+              {friendStatus === 'request_sent' && 'Request Sent'}
+              {friendStatus === 'request_received' && 'Request Received'}
+              {friendStatus === 'friends' && 'Friends'}
             </button>
           )}
 
           {loggedInUser === author && (
             <div className="dropdown">
               <button 
-                className="btn btn-link text-dark p-0 text-decoration-none" 
+                className="btn btn-link p-0 text-decoration-none" 
                 onClick={() => setShowDropdown(!showDropdown)}
               >
-                <MoreHorizontal size={24} color="#262626" />
+                <MoreHorizontal size={24} className="text-muted-dark" />
               </button>
               {showDropdown && (
-                <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm border-0 rounded-3" style={{ minWidth: '150px', zIndex: 1000, backgroundColor: '#fff', border: '1px solid #dbdbdb' }}>
-                  <button className="dropdown-item d-flex align-items-center py-2" onClick={() => { setEditMode(true); setShowDropdown(false); }}>
+                <div className="dropdown-menu show position-absolute end-0 mt-2 shadow-sm border-0 rounded-3" style={{ minWidth: '150px', zIndex: 1000, backgroundColor: 'var(--bg-tertiary)' }}>
+                  <button className="dropdown-item d-flex align-items-center py-2 text-primary" onClick={() => { setEditMode(true); setShowDropdown(false); }}>
                     <Edit2 size={16} className="me-2" /> Edit Post
                   </button>
                   <button className="dropdown-item d-flex align-items-center py-2 text-danger" onClick={handleDelete}>
@@ -300,28 +276,28 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
       </div>
 
       {/* Body Content */}
-      <div className="card-body px-4 py-2">
+      <div className="px-2 py-2">
         {editMode ? (
           <div className="mb-3">
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="form-control mb-2 rounded-3"
+              className="form-control-dark mb-2 w-100"
               placeholder="Post Title"
             />
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              className="form-control mb-2 rounded-3"
+              className="form-control-dark mb-2 w-100"
               rows="4"
               placeholder="What's on your mind?"
             />
             <div className="d-flex gap-2">
-              <button className="btn btn-primary rounded-pill px-4 btn-sm" onClick={handleEdit}>
+              <button className="btn-primary-accent btn-sm" onClick={handleEdit}>
                 Save Changes
               </button>
-              <button className="btn btn-light rounded-pill px-4 border btn-sm" onClick={() => setEditMode(false)}>
+              <button className="btn-outline-accent btn-sm" onClick={() => setEditMode(false)}>
                 Cancel
               </button>
             </div>
@@ -329,9 +305,9 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
         ) : (
           <>
             {title && <h5 className="card-title fw-bold mb-2">{title}</h5>}
-            <p className="card-text text-dark fs-6" style={{ whiteSpace: 'pre-line', margin: 0 }}>{content}</p>
+            <p className="card-text fs-6" style={{ whiteSpace: 'pre-line', margin: 0 }}>{content}</p>
             {media_file && (
-              <div className="mt-3 text-center" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', overflow: 'hidden' }}>
+              <div className="mt-3 text-center" style={{ backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px', overflow: 'hidden' }}>
                 {media_type === 'image' ? (
                   <img src={media_file.startsWith('http') ? media_file : `${import.meta.env.VITE_API_BASE_URL}${media_file}`} alt="Post Media" style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain' }} />
                 ) : media_type === 'video' ? (
@@ -347,80 +323,81 @@ const Post = ({ postId, title, author, content, media_file, media_type, likes: i
       </div>
 
       {/* Actions / Footer */}
-      <div className="card-footer bg-white border-0 px-3 pb-3 pt-2">
-        <div className="d-flex justify-content-between align-items-center mb-2">
+      <div className="border-0 px-2 pb-3 pt-2">
+        <div className="d-flex justify-content-between align-items-center mb-2 mt-3 border-top pt-3" style={{borderColor: 'rgba(255,255,255,0.05)'}}>
           <div className="d-flex gap-3 align-items-center">
             <button 
               className="btn btn-link p-0 text-decoration-none d-flex align-items-center justify-content-center"
-              style={{ color: isLiked ? '#ed4956' : '#262626' }}
+              style={{ color: isLiked ? 'var(--danger)' : 'var(--text-secondary)' }}
               onClick={handleLike}
             >
-              <Heart size={26} fill={isLiked ? '#ed4956' : 'none'} color={isLiked ? '#ed4956' : '#262626'} />
+              <Heart size={26} fill={isLiked ? 'var(--danger)' : 'none'} color={isLiked ? 'var(--danger)' : 'var(--text-secondary)'} />
             </button>
 
             <button 
               className="btn btn-link p-0 text-decoration-none d-flex align-items-center justify-content-center"
-              style={{ color: isDisliked ? '#262626' : '#262626' }}
+              style={{ color: isDisliked ? 'var(--warning)' : 'var(--text-secondary)' }}
               onClick={handleDislike}
             >
-              <ThumbsDown size={26} fill={isDisliked ? '#262626' : 'none'} color="#262626" />
+              <ThumbsDown size={26} fill={isDisliked ? 'var(--warning)' : 'none'} color={isDisliked ? 'var(--warning)' : 'var(--text-secondary)'} />
             </button>
 
             <button 
-              className="btn btn-link p-0 text-decoration-none d-flex align-items-center justify-content-center"
-              style={{ color: '#262626' }}
+              className="btn btn-link p-0 text-decoration-none d-flex align-items-center justify-content-center text-muted-dark"
               onClick={() => setShowComments(!showComments)}
             >
-              <MessageCircle size={26} color="#262626" />
+              <MessageCircle size={26} />
             </button>
           </div>
 
           <button 
-            className="btn btn-link p-0 text-decoration-none d-flex align-items-center justify-content-center"
-            style={{ color: '#262626' }}
+            className="btn btn-link p-0 text-decoration-none d-flex align-items-center justify-content-center text-muted-dark"
             onClick={toggleSave}
           >
-            <Bookmark size={26} fill={isSaved ? '#262626' : 'none'} color="#262626" />
+            <Bookmark size={26} fill={isSaved ? 'var(--text-secondary)' : 'none'} />
           </button>
         </div>
 
         {/* Likes / Dislikes Count */}
-        <div className="fw-bold mb-2 mt-1" style={{ fontSize: '14px', color: '#262626' }}>
+        <div className="fw-bold mb-2 mt-1" style={{ fontSize: '14px' }}>
           {likes} {likes === 1 ? 'like' : 'likes'} 
-          {dislikes > 0 && <span className="ms-2 text-muted fw-normal">• {dislikes} dislikes</span>}
+          {dislikes > 0 && <span className="ms-2 text-muted-dark fw-normal">• {dislikes} dislikes</span>}
         </div>
 
-        {message && <small className="text-success d-block mb-2">{message}</small>}
+        {message && (
+          <small className={`d-block mb-2 ${message.toLowerCase().includes('error') || message.toLowerCase().includes('not found') || message.toLowerCase().includes('already exists') ? 'text-danger' : 'text-success'}`}>
+            {message}
+          </small>
+        )}
 
         {/* Comments Section */}
         {showComments && (
-          <div className="mt-2 border-top pt-3">
+          <div className="mt-2 border-top pt-3" style={{borderColor: 'rgba(255,255,255,0.05)'}}>
             {comments.length > 0 ? (
               <div className="mb-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                 {comments.map((comment) => (
                   <div key={comment.id} className="mb-2 lh-sm">
-                    <span className="fw-bold me-2" style={{ fontSize: '14px', color: '#262626' }}>{comment.author || 'User'}</span>
-                    <span style={{ fontSize: '14px', color: '#262626' }}>{comment.content}</span>
+                    <span className="fw-bold me-2" style={{ fontSize: '14px' }}>{comment.author || 'User'}</span>
+                    <span style={{ fontSize: '14px' }}>{comment.content}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-muted small mb-3">No comments yet. Be the first to comment!</p>
+              <p className="text-muted-dark small mb-3">No comments yet. Be the first to comment!</p>
             )}
 
             <form onSubmit={handleAddComment} className="d-flex align-items-center position-relative mt-2">
               <input
                 type="text"
-                className="form-control rounded-pill pe-5 bg-light border-0"
+                className="form-control-dark pe-5 w-100"
                 placeholder="Add a comment..."
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
-                style={{ fontSize: '14px', padding: '10px 15px', boxShadow: 'none' }}
               />
               <button 
                 type="submit" 
                 className="btn btn-link position-absolute end-0 text-decoration-none fw-bold"
-                style={{ color: commentContent.trim() ? '#0095f6' : '#a8c7fa', padding: '0 15px' }}
+                style={{ color: commentContent.trim() ? 'var(--accent-primary)' : 'var(--text-secondary)', padding: '0 15px' }}
                 disabled={loading || !commentContent.trim()}
               >
                 Post

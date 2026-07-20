@@ -3,35 +3,27 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 # from django.contrib.auth.models import User
 from rest_framework.response import Response
-from rest_framework.decorators import api_view,  permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import UserRateThrottle
 from rest_framework import status
-from .serializers import ProfileUpdateSerializer
+from .serializers import ProfileUpdateSerializer, UserRegistrationSerializer
 from .models import User
 from .models import Profile, Friendship, Block
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 
 
 @api_view(['POST'])
 def signup_user(request):
-    username = request.data.get('username')
-    email = request.data.get('email')
-    password = request.data.get('password')
-
-    # Check if the username already exists
-    if User.objects.filter(username=username).exists():
-        return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Create the user
-    user = User.objects.create(
-        username=username,
-        email=email,
-        password=make_password(password),  
-    )
-    return Response({'message': f'User "{username}" created successfully'}, status=status.HTTP_201_CREATED)
+    serializer = UserRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': f'User "{serializer.validated_data["username"]}" created successfully'}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def login_user(request):
@@ -141,38 +133,42 @@ def search_users(request):
     query = request.GET.get('q', '')
     blocked_users = Block.objects.filter(blocker=request.user).values_list('blocked_user_id', flat=True)
     blockers = Block.objects.filter(blocked_user=request.user).values_list('blocker_id', flat=True)
-    users = User.objects.exclude(id=request.user.id).exclude(id__in=blocked_users).exclude(id__in=blockers)
+    
+    # Exclude already friends
+    friendships = Friendship.objects.filter(
+        (Q(from_user=request.user) | Q(to_user=request.user)) & Q(status='accepted')
+    )
+    friend_ids = [f.to_user_id if f.from_user == request.user else f.from_user_id for f in friendships]
+    
+    users = User.objects.exclude(id=request.user.id).exclude(id__in=blocked_users).exclude(id__in=blockers).exclude(id__in=friend_ids)
     if query:
         users = users.filter(username__icontains=query)
     
+    paginator = PageNumberPagination()
+    paginated_users = paginator.paginate_queryset(users.order_by('id'), request)
+    
     results = []
-    for u in users:
-        # Determine friendship status
+    for u in paginated_users:
         status_val = 'none'
         f1 = Friendship.objects.filter(from_user=request.user, to_user=u).first()
         f2 = Friendship.objects.filter(from_user=u, to_user=request.user).first()
         
-        if f1:
-            if f1.status == 'accepted':
-                status_val = 'friends'
-            elif f1.status == 'pending':
-                status_val = 'request_sent'
-        elif f2:
-            if f2.status == 'accepted':
-                status_val = 'friends'
-            elif f2.status == 'pending':
-                status_val = 'request_received'
+        if f1 and f1.status == 'pending':
+            status_val = 'request_sent'
+        elif f2 and f2.status == 'pending':
+            status_val = 'request_received'
 
         results.append({
             'id': u.id,
             'username': u.username,
             'status': status_val
         })
-    return Response(results, status=status.HTTP_200_OK)
+    return paginator.get_paginated_response(results)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([UserRateThrottle])
 def send_friend_request(request):
     to_user_id = request.data.get('to_user_id')
     try:
@@ -222,27 +218,35 @@ def list_friends(request):
     friendships = Friendship.objects.filter(
         (Q(from_user=request.user) | Q(to_user=request.user)) & Q(status='accepted')
     ).exclude(from_user_id__in=blocked_users).exclude(to_user_id__in=blocked_users)\
-     .exclude(from_user_id__in=blockers).exclude(to_user_id__in=blockers)
+     .exclude(from_user_id__in=blockers).exclude(to_user_id__in=blockers).order_by('-created_at')
+     
+    paginator = PageNumberPagination()
+    paginated_friendships = paginator.paginate_queryset(friendships, request)
+    
     friends = []
-    for f in friendships:
+    for f in paginated_friendships:
         friend_user = f.to_user if f.from_user == request.user else f.from_user
         friends.append({
             'id': friend_user.id,
             'username': friend_user.username
         })
-    return Response(friends, status=status.HTTP_200_OK)
+    return paginator.get_paginated_response(friends)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_pending_requests(request):
-    requests = Friendship.objects.filter(to_user=request.user, status='pending')
+    requests = Friendship.objects.filter(to_user=request.user, status='pending').order_by('-created_at')
+    
+    paginator = PageNumberPagination()
+    paginated_requests = paginator.paginate_queryset(requests, request)
+    
     pending = []
-    for r in requests:
+    for r in paginated_requests:
         pending.append({
             'id': r.from_user.id,
             'username': r.from_user.username
         })
-    return Response(pending, status=status.HTTP_200_OK)
+    return paginator.get_paginated_response(pending)
 
 
 from .models import Message
@@ -289,3 +293,36 @@ def block_user(request):
         return Response({'message': 'User blocked successfully'}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def manage_chat_preferences(request):
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        profile = Profile.objects.create(
+            user=request.user,
+            name=request.user.username,
+            email=request.user.email
+        )
+        
+    if request.method == 'GET':
+        return Response({
+            'wallpaper': profile.chat_wallpaper,
+            'bubble_theme': profile.chat_bubble_theme
+        }, status=status.HTTP_200_OK)
+        
+    elif request.method == 'PATCH':
+        wallpaper = request.data.get('wallpaper')
+        bubble_theme = request.data.get('bubble_theme')
+        
+        if wallpaper is not None:
+            profile.chat_wallpaper = wallpaper
+        if bubble_theme is not None:
+            profile.chat_bubble_theme = bubble_theme
+            
+        profile.save()
+        return Response({
+            'wallpaper': profile.chat_wallpaper,
+            'bubble_theme': profile.chat_bubble_theme
+        }, status=status.HTTP_200_OK)

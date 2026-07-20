@@ -1,6 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
+class Circle(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_circles')
+    created_at = models.DateTimeField(auto_now_add=True)
+    members = models.ManyToManyField(User, related_name='circles')
+
+    def __str__(self):
+        return self.name
+
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     author = models.CharField(max_length=100)
@@ -10,6 +20,7 @@ class Post(models.Model):
     media_type = models.CharField(max_length=10, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    circles = models.ManyToManyField(Circle, related_name='posts', blank=True)
 
     def like_count(self):
         return self.interactions.filter(interaction_type='like').count()
